@@ -216,7 +216,8 @@ extension Parser {
             } else {
                 fail()
             }
-        } else if currentToken.type == .eof || currentToken.type == .rightParenthesis {
+        } else if currentToken.type == .eof ||
+            currentToken.type == .rightParenthesis { // Expr' -> ε
             return true
         } else {
             fail()
@@ -240,7 +241,10 @@ extension Parser {
             } else {
                 fail()
             }
-        } else if currentToken.type == .plus || currentToken.type == .minus || currentToken.type == .eof {
+        } else if currentToken.type == .plus ||
+            currentToken.type == .minus ||
+            currentToken.type == .rightParenthesis ||
+            currentToken.type == .eof { // Term' -> ε
             return true
         } else {
             fail()
@@ -258,6 +262,7 @@ extension Parser {
                 fail()
             }
             
+            currentToken = try lexer.nextToken()
             return true
         } else if currentToken.type == .num || currentToken.type == .name {
             currentToken = try lexer.nextToken()
