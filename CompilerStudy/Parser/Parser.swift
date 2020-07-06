@@ -12,9 +12,16 @@
             | name
 */
 
-struct Production {
+import Foundation
+
+class Production: NSObject {
     let left: NonterminalNode
     let right: [Node]
+    
+    init(left: NonterminalNode, right: [Node]) {
+        self.left = left
+        self.right = right
+    }
 }
 
 class Parser {
@@ -43,15 +50,16 @@ class Parser {
         return _firstCollection_
     }
     
-    private var _firstCollection_: FirstCollection = .init([])
-    
     var followCollection: FollowCollection {
         return _followCollection_
     }
     
-    private var _followCollection_: FollowCollection = .init([])
+    private let lexer: Lexer
+    private var currentToken: LexerToken!
     
-    init() {
+    init(lexer: Lexer) {
+        self.lexer = lexer
+
         _firstCollection_ = produceFirstCollection()
         _followCollection_ = produceFollowCollection()
     }
@@ -64,7 +72,9 @@ class Parser {
         produceFollowCollection(productions, TVS: TVS, NTVS: NTVS, firstCollection: _firstCollection_)
     }
     
-    
+    private var _firstCollection_: FirstCollection = .init([])
+    private var _followCollection_: FollowCollection = .init([])
+    private var _enhanceFirstCollection: EnhanceFirstCollection = .init([:])
 }
 
 extension Parser {
@@ -168,5 +178,97 @@ extension Parser {
         let items = followCollection.map({ FollowItem(node: $0.key.node as! NonterminalNode, items: Array($0.value).map({ $0.node })) })
         
         return .init(items)
+    }
+}
+
+extension Parser {
+    func parse() throws -> Bool {
+        try main()
+    }
+    
+    private func main() throws -> Bool {
+        currentToken = try lexer.nextToken()
+        if try expr() {
+            if currentToken.type == .eof {
+                return true
+            } else {
+                fail()
+            }
+        }
+        
+        fail()
+    }
+    
+    private func expr() throws -> Bool {
+        if try term() {
+            return try exprPrime()
+        }
+        
+        fail()
+    }
+    
+    private func exprPrime() throws -> Bool {
+        if currentToken.type == .plus || currentToken.type == .minus {
+            currentToken = try lexer.nextToken()
+            
+            if try term() {
+                return try exprPrime()
+            } else {
+                fail()
+            }
+        } else if currentToken.type == .eof || currentToken.type == .rightParenthesis {
+            return true
+        } else {
+            fail()
+        }
+    }
+    
+    private func term() throws -> Bool {
+        if try factor() {
+            return try termPrime()
+        }
+        
+        fail()
+    }
+    
+    private func termPrime() throws -> Bool {
+        if currentToken.type == .divide || currentToken.type == .mutiply {
+            currentToken = try lexer.nextToken()
+            
+            if try factor() {
+                return try termPrime()
+            } else {
+                fail()
+            }
+        } else if currentToken.type == .plus || currentToken.type == .minus || currentToken.type == .eof {
+            return true
+        } else {
+            fail()
+        }
+    }
+    
+    private func factor() throws -> Bool {
+        if currentToken.type == .leftParenthesis {
+            currentToken = try lexer.nextToken()
+            if !(try expr()) {
+                fail()
+            }
+            
+            if currentToken.type != .rightParenthesis {
+                fail()
+            }
+            
+            return true
+        } else if currentToken.type == .num || currentToken.type == .name {
+            currentToken = try lexer.nextToken()
+            return true
+        } else {
+            fail()
+        }
+    }
+    
+    private func fail() -> Never {
+        NSException(name: .init("Parse failed"), reason: "", userInfo: nil).raise()
+        exit(1)
     }
 }
