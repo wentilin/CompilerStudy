@@ -1,17 +1,3 @@
-/*
-    Expr  ->  Term Expr'
-    Expr' ->  + Term Expr'
-            | - Term Expr'
-            | e
-    Term  ->  Factor Term'
-    Term' ->  / Factor Term'
-            | * Factor Term'
-            | e
-    Factor -> ( Expr )
-            | num
-            | name
-*/
-
 import Foundation
 
 class Production: NSObject {
@@ -24,6 +10,17 @@ class Production: NSObject {
     }
 }
 
+/// Expr  ->  Term Expr'
+/// Expr' ->  + Term Expr'
+///       | - Term Expr'
+///       | e
+/// Term  ->  Factor Term'
+/// Term' ->  / Factor Term'
+///       | * Factor Term'
+///       | e
+/// Factor -> ( Expr )
+///       | num
+///       | name
 class Parser {
     /// Terminal collection
     let TVS: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
@@ -186,6 +183,7 @@ extension Parser {
         try main()
     }
     
+    /// Start parsing
     private func main() throws -> Bool {
         currentToken = try lexer.nextToken()
         if try expr() {
@@ -199,6 +197,7 @@ extension Parser {
         throw error(with: "Unknow expression")
     }
     
+    /// Expr  ->  Term Expr'
     private func expr() throws -> Bool {
         if try term() {
             return try exprPrime()
@@ -207,6 +206,9 @@ extension Parser {
         throw error(with: "Unknow expression")
     }
     
+    /// Expr' ->  + Term Expr'
+    ///       | - Term Expr'
+    ///       | e
     private func exprPrime() throws -> Bool {
         if currentToken.type == .plus || currentToken.type == .minus {
             currentToken = try lexer.nextToken()
@@ -224,6 +226,7 @@ extension Parser {
         }
     }
     
+    /// Term  ->  Factor Term'
     private func term() throws -> Bool {
         if try factor() {
             return try termPrime()
@@ -232,6 +235,9 @@ extension Parser {
         throw error(with: "Unknow expression")
     }
     
+    /// Term' ->  / Factor Term'
+    ///       | * Factor Term'
+    ///       | e
     private func termPrime() throws -> Bool {
         if currentToken.type == .divide || currentToken.type == .mutiply {
             currentToken = try lexer.nextToken()
@@ -251,6 +257,9 @@ extension Parser {
         }
     }
     
+    /// Factor -> ( Expr )
+    ///       | num
+    ///       | name
     private func factor() throws -> Bool {
         if currentToken.type == .leftParenthesis {
             currentToken = try lexer.nextToken()
