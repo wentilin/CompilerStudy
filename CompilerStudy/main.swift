@@ -9,4 +9,5 @@
 import Foundation
 
 let parser = Parser()
-print(parser.produceFirstCollection())
+print(parser.firstCollection)
+print(parser.followCollection)

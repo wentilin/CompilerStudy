@@ -16,6 +16,7 @@ enum NodeType {
     case nonterminal
     case terminal
     case epsilon
+    case eof
 }
 
 protocol Node: CustomStringConvertible {
@@ -33,6 +34,8 @@ struct NodeWrapper: Hashable, CustomStringConvertible {
     private static var _cache: [String: NodeWrapper] = [:]
     
     static var epsilonWrapper: NodeWrapper = .init(Epsilon.default)
+    
+    static var eofWrapper: NodeWrapper = .init(EOFNode.default)
     
     private init(_ node: Node) {
         self.node = node
@@ -99,17 +102,80 @@ struct Epsilon: Node {
     var type: NodeType { .epsilon }
 }
 
+struct EOFNode: Node {
+    static let `default`: EOFNode = EOFNode()
+    
+    var value: String { "eof" }
+    
+    var type: NodeType { .eof }
+}
+
 struct Production {
     let left: NonterminalNode
     let right: [Node]
 }
 
-struct FirstCollection: CustomStringConvertible {
+struct FirstItem: CustomStringConvertible {
     let node: Node
     var items: [Node]
     
     var description: String {
         return "\(node.value): \(items)"
+    }
+}
+
+struct FirstCollection: CustomStringConvertible {
+    private var items: [NodeWrapper: FirstItem] = [:]
+    
+    init(_ items: [FirstItem]) {
+        for item in items {
+            self.items[NodeWrapper.with(item.node)] = item
+        }
+    }
+    
+    subscript(node: Node) -> [Node] {
+        return items[NodeWrapper.with(node)]?.items ?? []
+    }
+    
+    var description: String {
+        var des = "FristCollection(\n"
+        for item in items {
+            des += "    \(item.key.node.value): \(item.value.items), \n"
+        }
+        
+        des += ")"
+        
+        return des
+    }
+}
+
+struct FollowItem {
+    let node: NonterminalNode
+    var items: [Node]
+}
+
+struct FollowCollection: CustomStringConvertible {
+    private var items: [NodeWrapper: FollowItem] = [:]
+    
+    init(_ items: [FollowItem]) {
+        for item in items {
+            self.items[NodeWrapper.with(item.node)] = item
+        }
+    }
+    
+    subscript(node: Node) -> [Node] {
+        return items[NodeWrapper.with(node)]?.items ?? []
+    }
+    
+    var description: String {
+        var des = "FollowCollection(\n"
+        for item in items {
+            des += "    \(item.key.node.value): \(item.value.items), \n"
+        }
+        
+        des += ")"
+        
+        return des
     }
 }
 
@@ -135,11 +201,36 @@ class Parser {
         Production(left: .factor, right: [TerminalNode.name]),
     ]
     
-    func produceFirstCollection() -> [FirstCollection] {
+    var firstCollection: FirstCollection {
+        return _firstCollection_
+    }
+    
+    private var _firstCollection_: FirstCollection = .init([])
+    
+    var followCollection: FollowCollection {
+        return _followCollection_
+    }
+    
+    private var _followCollection_: FollowCollection = .init([])
+    
+    init() {
+        _firstCollection_ = produceFirstCollection()
+        _followCollection_ = produceFollowCollection()
+    }
+    
+    func produceFirstCollection() -> FirstCollection {
         produceFirstCollection(productions, TVS: TVS, NTVS: NTVS)
     }
     
-    private func produceFirstCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode]) -> [FirstCollection] {
+    func produceFollowCollection() -> FollowCollection {
+        produceFollowCollection(productions, TVS: TVS, NTVS: NTVS, firstCollection: _firstCollection_)
+    }
+    
+    
+}
+
+extension Parser {
+    private func produceFirstCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode]) -> FirstCollection {
         var fCollection: [NodeWrapper: Set<NodeWrapper>] = [:]
         
         // terminate
@@ -149,6 +240,9 @@ class Parser {
         
         // epsilon
         fCollection[NodeWrapper.epsilonWrapper] = [NodeWrapper.epsilonWrapper]
+        
+        // eof
+        fCollection[NodeWrapper.eofWrapper] = [NodeWrapper.eofWrapper]
         
         // noterminate
         for t in NTVS {
@@ -187,6 +281,54 @@ class Parser {
             }
         }
         
-        return fCollection.map({ FirstCollection(node: $0.key.node, items: Array($0.value).map({ $0.node })) })
+        let items = fCollection.map({ FirstItem(node: $0.key.node, items: Array($0.value).map({ $0.node })) })
+        
+        return .init(items)
+    }
+    
+    private func produceFollowCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode], firstCollection: FirstCollection) -> FollowCollection {
+        var followCollection: [NodeWrapper: Set<NodeWrapper>] = [:]
+        
+        // set empty
+        for item in NTVS {
+            followCollection[NodeWrapper.with(item)] = []
+        }
+        
+        // start
+        followCollection[.with(productions[0].left)] = [.eofWrapper]
+        
+        var hasChanged = true
+        while hasChanged {
+            hasChanged = false
+            for production in productions {
+                var trailer = followCollection[NodeWrapper.with(production.left)]!
+                for i in 0..<production.right.count {
+                    let j = production.right.count - 1 - i
+                    let node = production.right[j]
+                    let fisrtItem = Set<NodeWrapper>(firstCollection[node].map({ NodeWrapper.with($0) }))
+                    if node.type == .nonterminal {
+                        let beforeCount = followCollection[NodeWrapper.with(node)]!.count
+                        followCollection[NodeWrapper.with(node)]!.formUnion(trailer)
+                        let afterCount = followCollection[NodeWrapper.with(node)]!.count
+                        
+                        hasChanged = hasChanged || (beforeCount != afterCount)
+                        
+                        let containsEpsilon = firstCollection[node].contains{ $0.value == Epsilon.default.value }
+                        if containsEpsilon {
+                            trailer.formUnion(fisrtItem)
+                            trailer.remove(.epsilonWrapper)
+                        } else {
+                            trailer = Set<NodeWrapper>(fisrtItem)
+                        }
+                    } else {
+                        trailer = Set<NodeWrapper>(fisrtItem)
+                    }
+                }
+            }
+        }
+        
+        let items = followCollection.map({ FollowItem(node: $0.key.node as! NonterminalNode, items: Array($0.value).map({ $0.node })) })
+        
+        return .init(items)
     }
 }
