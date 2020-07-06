@@ -8,8 +8,16 @@
 
 import Foundation
 
-let lexer = Lexer("1 + 3 - (4 - 4 * 5)")
+let text = "1 + 3 - (4 - 4 * 5))"
+let lexer = Lexer(text)
 let parser = Parser(lexer: lexer)
 print(parser.firstCollection)
 print(parser.followCollection)
-print(try? parser.parse())
+
+print("Begin parse: \(text)")
+do {
+    let result = try parser.parse()
+    print("Parse result: \(result)")
+} catch {
+    print("Parse failed: \(error)")
+}

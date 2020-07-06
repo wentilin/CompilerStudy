@@ -192,11 +192,11 @@ extension Parser {
             if currentToken.type == .eof {
                 return true
             } else {
-                fail()
+                throw error(with: "Unknow expression")
             }
         }
         
-        fail()
+        throw error(with: "Unknow expression")
     }
     
     private func expr() throws -> Bool {
@@ -204,7 +204,7 @@ extension Parser {
             return try exprPrime()
         }
         
-        fail()
+        throw error(with: "Unknow expression")
     }
     
     private func exprPrime() throws -> Bool {
@@ -214,13 +214,13 @@ extension Parser {
             if try term() {
                 return try exprPrime()
             } else {
-                fail()
+                throw error(with: "Unknow expression")
             }
         } else if currentToken.type == .eof ||
             currentToken.type == .rightParenthesis { // Expr' -> ε
             return true
         } else {
-            fail()
+            throw error(with: "Unknow expression")
         }
     }
     
@@ -229,7 +229,7 @@ extension Parser {
             return try termPrime()
         }
         
-        fail()
+        throw error(with: "Unknow expression")
     }
     
     private func termPrime() throws -> Bool {
@@ -239,7 +239,7 @@ extension Parser {
             if try factor() {
                 return try termPrime()
             } else {
-                fail()
+                throw error(with: "Unknow expression")
             }
         } else if currentToken.type == .plus ||
             currentToken.type == .minus ||
@@ -247,7 +247,7 @@ extension Parser {
             currentToken.type == .eof { // Term' -> ε
             return true
         } else {
-            fail()
+            throw error(with: "Unknow expression")
         }
     }
     
@@ -255,11 +255,11 @@ extension Parser {
         if currentToken.type == .leftParenthesis {
             currentToken = try lexer.nextToken()
             if !(try expr()) {
-                fail()
+                throw error(with: "Unknow expression")
             }
             
             if currentToken.type != .rightParenthesis {
-                fail()
+                throw error(with: "Can't find )")
             }
             
             currentToken = try lexer.nextToken()
@@ -268,12 +268,11 @@ extension Parser {
             currentToken = try lexer.nextToken()
             return true
         } else {
-            fail()
+            throw error(with: "Unknow expression")
         }
     }
     
-    private func fail() -> Never {
-        NSException(name: .init("Parse failed"), reason: "", userInfo: nil).raise()
-        exit(1)
+    private func error(with reason: String) -> NSError {
+        return .init(domain: "Parse failed", code: -1, userInfo: ["reason": reason])
     }
 }
