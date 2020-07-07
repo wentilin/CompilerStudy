@@ -1,15 +1,5 @@
 import Foundation
 
-class Production: NSObject {
-    let left: NonterminalNode
-    let right: [Node]
-    
-    init(left: NonterminalNode, right: [Node]) {
-        self.left = left
-        self.right = right
-    }
-}
-
 /// Expr  ->  Term Expr'
 /// Expr' ->  + Term Expr'
 ///       | - Term Expr'
@@ -23,10 +13,10 @@ class Production: NSObject {
 ///       | name
 class Parser {
     /// Terminal collection
-    let TVS: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
+    let terminals: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
     
     /// Nonterminal collection
-    let NTVS: [NonterminalNode] = [.expr, .expr_, .term, .term_, .factor]
+    let nonterminals: [NonterminalNode] = [.expr, .expr_, .term, .term_, .factor]
     
     /// Proction collection
     let productions: [Production] = [
@@ -51,6 +41,14 @@ class Parser {
         return _followCollection_
     }
     
+    var enhanceFirstCollection: EnhanceFirstCollection {
+        return _enhanceFirstCollection_
+    }
+    
+    var analyticTable: AnalyticTable {
+        return _analyticTable_
+    }
+    
     private let lexer: Lexer
     private var currentToken: LexerToken!
     
@@ -59,27 +57,38 @@ class Parser {
 
         _firstCollection_ = produceFirstCollection()
         _followCollection_ = produceFollowCollection()
+        _enhanceFirstCollection_ = produceEnhanceFirstCollection()
+        _analyticTable_ = produceAnalyticTable()
     }
     
     func produceFirstCollection() -> FirstCollection {
-        produceFirstCollection(productions, TVS: TVS, NTVS: NTVS)
+        produceFirstCollection(productions, terminals: terminals, nonterminals: nonterminals)
     }
     
     func produceFollowCollection() -> FollowCollection {
-        produceFollowCollection(productions, TVS: TVS, NTVS: NTVS, firstCollection: _firstCollection_)
+        produceFollowCollection(productions, terminals: terminals, nonterminals: nonterminals, firstCollection: _firstCollection_)
+    }
+    
+    func produceEnhanceFirstCollection() -> EnhanceFirstCollection {
+        produceEnchanceFisrtCollection(productions: productions, firstCollection: firstCollection, followCollection: followCollection)
+    }
+    
+    func produceAnalyticTable() -> AnalyticTable {
+        produceAnalyticTable(productions: productions, nonterminals: nonterminals, enhanceFirstCollection: enhanceFirstCollection)
     }
     
     private var _firstCollection_: FirstCollection = .init([])
     private var _followCollection_: FollowCollection = .init([])
-    private var _enhanceFirstCollection: EnhanceFirstCollection = .init([:])
+    private var _enhanceFirstCollection_: EnhanceFirstCollection = .init([:])
+    private var _analyticTable_: AnalyticTable = .init()
 }
 
 extension Parser {
-    private func produceFirstCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode]) -> FirstCollection {
+    private func produceFirstCollection(_ productions: [Production], terminals: [TerminalNode], nonterminals: [NonterminalNode]) -> FirstCollection {
         var fCollection: [NodeWrapper: Set<NodeWrapper>] = [:]
         
         // terminate
-        for t in TVS {
+        for t in terminals {
             fCollection[NodeWrapper.with(t)] = [NodeWrapper.with(t)]
         }
         
@@ -90,7 +99,7 @@ extension Parser {
         fCollection[NodeWrapper.eofWrapper] = [NodeWrapper.eofWrapper]
         
         // noterminate
-        for t in NTVS {
+        for t in nonterminals {
             fCollection[NodeWrapper.with(t)] = []
         }
         
@@ -131,11 +140,11 @@ extension Parser {
         return .init(items)
     }
     
-    private func produceFollowCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode], firstCollection: FirstCollection) -> FollowCollection {
+    private func produceFollowCollection(_ productions: [Production], terminals: [TerminalNode], nonterminals: [NonterminalNode], firstCollection: FirstCollection) -> FollowCollection {
         var followCollection: [NodeWrapper: Set<NodeWrapper>] = [:]
         
         // set empty
-        for item in NTVS {
+        for item in nonterminals {
             followCollection[NodeWrapper.with(item)] = []
         }
         
@@ -176,15 +185,74 @@ extension Parser {
         
         return .init(items)
     }
+    
+    private func produceEnchanceFisrtCollection(productions: [Production], firstCollection: FirstCollection, followCollection: FollowCollection) -> EnhanceFirstCollection {
+        var fCollection: [Production: [Node]] = [:]
+        
+        for production in productions {
+            let rightNodes = production.right
+            var rhs = Set<NodeWrapper>(firstCollection[production.right[0]].map({ NodeWrapper.with($0)}))
+            
+            var i = 0
+            if !rightNodes.contains(where: { (node) -> Bool in
+                return node.value == Epsilon.default.value
+            }) {
+                while i < (production.right.count-1), firstCollection[production.right[i]].contains(where: { (node) -> Bool in
+                    return node.value == Epsilon.default.value
+                }) {
+                    
+                    let next = Set<NodeWrapper>(firstCollection[production.right[i+1]].map({ NodeWrapper.with($0)}))
+                    rhs.formUnion(next)
+                    rhs.remove(.epsilonWrapper)
+                    i += 1
+                }
+                
+                if i == production.right.count-1, firstCollection[production.right[i]].contains(where: { (node) -> Bool in
+                    return node.value == Epsilon.default.value
+                }) {
+                    rhs.insert(.epsilonWrapper)
+                }
+            }
+            
+            if rhs.contains(where: { wrapper in
+                wrapper.node.value == Epsilon.default.value
+            }) {
+                rhs.formUnion(Set<NodeWrapper>(followCollection[production.left].map({ NodeWrapper.with($0) })))
+            }
+            
+            fCollection[production] = Array(rhs).map({ $0.node })
+        }
+        
+        return .init(fCollection)
+    }
+    
+    private func produceAnalyticTable(productions: [Production], nonterminals: [NonterminalNode], enhanceFirstCollection: EnhanceFirstCollection) -> AnalyticTable {
+        var table = AnalyticTable()
+        
+        for production in productions {
+            for node in enhanceFirstCollection[production] {
+                if node.type == .terminal {
+                    table[production.left, node] = production
+                }
+            }
+            
+            if enhanceFirstCollection[production].contains(where: { $0.value == EOFNode.default.value}) {
+                table[production.left, EOFNode.default] = production
+            }
+        }
+        
+        return table
+    }
 }
 
 extension Parser {
     func parse() throws -> Bool {
-        try main()
+//        try parseByRecursiveDesent()
+        try parseByLL1()
     }
     
     /// Start parsing
-    private func main() throws -> Bool {
+    private func parseByRecursiveDesent() throws -> Bool {
         currentToken = try lexer.nextToken()
         if try expr() {
             if currentToken.type == .eof {
@@ -239,7 +307,7 @@ extension Parser {
     ///       | * Factor Term'
     ///       | e
     private func termPrime() throws -> Bool {
-        if currentToken.type == .divide || currentToken.type == .mutiply {
+        if currentToken.type == .divide || currentToken.type == .multiply {
             currentToken = try lexer.nextToken()
             
             if try factor() {
@@ -283,5 +351,66 @@ extension Parser {
     
     private func error(with reason: String) -> NSError {
         return .init(domain: "Parse failed", code: -1, userInfo: ["reason": reason])
+    }
+}
+
+extension Parser {
+    func parseByLL1() throws -> Bool {
+        print("LL(1) parse start")
+        currentToken = try lexer.nextToken()
+        var stack: [Node] = []
+        stack.append(EOFNode.default)
+        stack.append(NonterminalNode.expr)
+        
+        print("\(stack) : \(currentToken.value) \(lexer)")
+        
+        var focus = stack.last!
+        while true {
+            if focus.type == .eof, currentToken.type == .eof {
+                print("LL(1) parse end")
+                return true
+            } else if focus.type == .terminal || focus.type == .eof {
+                if let node = (focus as? TerminalNode), node.matches(currentToken)  {
+                    stack.removeLast()
+                    currentToken = try lexer.nextToken()
+                    
+                    print("\(stack) : \(currentToken.value) \(lexer)")
+                } else {
+                    throw error(with: "LL1 parse failed.[ \(focus.value) not matches \(currentToken.value) ]")
+                }
+            } else {
+                if let production = analyticTable[focus as! NonterminalNode, currentToken.node] {
+                    stack.removeLast()
+                    for i in 0..<production.right.count {
+                        let node = production.right[production.right.count - 1 - i]
+                        if node.type != .epsilon {
+                            stack.append(node)
+                        }
+                    }
+                    print("\(stack) : \(currentToken.value) \(lexer)")
+                } else {
+                    throw error(with: "LL1 parse failed.[ \(focus.value) not matches \(currentToken.value) ]")
+                }
+            }
+            
+            focus = stack.last!
+        }
+    }
+}
+
+extension TerminalNode {
+    func matches(_ token: LexerToken) -> Bool {
+        return token.type.rawValue == self.rawValue
+    }
+}
+
+extension LexerToken {
+    var node: Node {
+        switch self.type {
+        case .eof:
+            return EOFNode.default
+        default:
+            return TerminalNode(rawValue: self.type.rawValue)!
+        }
     }
 }
