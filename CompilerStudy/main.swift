@@ -14,6 +14,7 @@ let parser = Parser(lexer: lexer)
 print(parser.firstCollection)
 print(parser.followCollection)
 print(parser.enhanceFirstCollection)
+print(parser.analyticTable)
 
 print("Begin parse: \(text)")
 do {

@@ -1,21 +1,5 @@
 import Foundation
 
-class Production: NSObject {
-    let left: NonterminalNode
-    let right: [Node]
-    
-    init(left: NonterminalNode, right: [Node]) {
-        self.left = left
-        self.right = right
-    }
-    
-    override var description: String {
-        return self.left.value + " ->" + right.reduce("", { (res, node) -> String in
-                     res + " " + node.value
-                })
-    }
-}
-
 /// Expr  ->  Term Expr'
 /// Expr' ->  + Term Expr'
 ///       | - Term Expr'
@@ -29,10 +13,10 @@ class Production: NSObject {
 ///       | name
 class Parser {
     /// Terminal collection
-    let TVS: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
+    let terminals: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
     
     /// Nonterminal collection
-    let NTVS: [NonterminalNode] = [.expr, .expr_, .term, .term_, .factor]
+    let nonterminals: [NonterminalNode] = [.expr, .expr_, .term, .term_, .factor]
     
     /// Proction collection
     let productions: [Production] = [
@@ -61,6 +45,10 @@ class Parser {
         return _enhanceFirstCollection_
     }
     
+    var analyticTable: AnalyticTable {
+        return _analyticTable_
+    }
+    
     private let lexer: Lexer
     private var currentToken: LexerToken!
     
@@ -70,31 +58,37 @@ class Parser {
         _firstCollection_ = produceFirstCollection()
         _followCollection_ = produceFollowCollection()
         _enhanceFirstCollection_ = produceEnhanceFirstCollection()
+        _analyticTable_ = produceAnalyticTable()
     }
     
     func produceFirstCollection() -> FirstCollection {
-        produceFirstCollection(productions, TVS: TVS, NTVS: NTVS)
+        produceFirstCollection(productions, terminals: terminals, nonterminals: nonterminals)
     }
     
     func produceFollowCollection() -> FollowCollection {
-        produceFollowCollection(productions, TVS: TVS, NTVS: NTVS, firstCollection: _firstCollection_)
+        produceFollowCollection(productions, TVS: terminals, NTVS: nonterminals, firstCollection: _firstCollection_)
     }
     
     func produceEnhanceFirstCollection() -> EnhanceFirstCollection {
         produceEnchanceFisrtCollection(productions: productions, firstCollection: firstCollection, followCollection: followCollection)
     }
     
+    func produceAnalyticTable() -> AnalyticTable {
+        produceAnalyticTable(productions: productions, nonterminals: nonterminals, enhanceFirstCollection: enhanceFirstCollection)
+    }
+    
     private var _firstCollection_: FirstCollection = .init([])
     private var _followCollection_: FollowCollection = .init([])
     private var _enhanceFirstCollection_: EnhanceFirstCollection = .init([:])
+    private var _analyticTable_: AnalyticTable = .init()
 }
 
 extension Parser {
-    private func produceFirstCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode]) -> FirstCollection {
+    private func produceFirstCollection(_ productions: [Production], terminals: [TerminalNode], nonterminals: [NonterminalNode]) -> FirstCollection {
         var fCollection: [NodeWrapper: Set<NodeWrapper>] = [:]
         
         // terminate
-        for t in TVS {
+        for t in terminals {
             fCollection[NodeWrapper.with(t)] = [NodeWrapper.with(t)]
         }
         
@@ -105,7 +99,7 @@ extension Parser {
         fCollection[NodeWrapper.eofWrapper] = [NodeWrapper.eofWrapper]
         
         // noterminate
-        for t in NTVS {
+        for t in nonterminals {
             fCollection[NodeWrapper.with(t)] = []
         }
         
@@ -230,6 +224,24 @@ extension Parser {
         }
         
         return .init(fCollection)
+    }
+    
+    private func produceAnalyticTable(productions: [Production], nonterminals: [NonterminalNode], enhanceFirstCollection: EnhanceFirstCollection) -> AnalyticTable {
+        var table = AnalyticTable()
+        
+        for production in productions {
+            for node in enhanceFirstCollection[production] {
+                if node.type == .terminal {
+                    table[production.left, node] = production
+                }
+            }
+            
+            if enhanceFirstCollection[production].contains(where: { $0.value == EOFNode.default.value}) {
+                table[production.left, EOFNode.default] = production
+            }
+        }
+        
+        return table
     }
 }
 
