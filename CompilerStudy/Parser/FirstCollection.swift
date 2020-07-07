@@ -44,7 +44,7 @@ struct FirstCollection: CustomStringConvertible {
 }
 
 /// FIRST+(A -> β) = if ε ∉ FIRST(β) then FIRST(β) else FIRST(β) U FOLLOW(A)
-struct EnhanceFirstCollection {
+struct EnhanceFirstCollection: CustomStringConvertible {
     private var items: [Production: [Node]] = [:]
     
     init(_ items: [Production: [Node]]) {
@@ -58,7 +58,7 @@ struct EnhanceFirstCollection {
     var description: String {
         var des = "EnhanceFristCollection(\n"
         for item in items {
-            des += "    \(item.key.left.value): \(item.value), \n"
+            des += "    \(item.key): \(item.value), \n"
         }
         
         des += ")"

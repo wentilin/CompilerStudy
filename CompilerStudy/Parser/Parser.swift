@@ -8,6 +8,12 @@ class Production: NSObject {
         self.left = left
         self.right = right
     }
+    
+    override var description: String {
+        return self.left.value + " ->" + right.reduce("", { (res, node) -> String in
+                     res + " " + node.value
+                })
+    }
 }
 
 /// Expr  ->  Term Expr'
@@ -51,6 +57,10 @@ class Parser {
         return _followCollection_
     }
     
+    var enhanceFirstCollection: EnhanceFirstCollection {
+        return _enhanceFirstCollection_
+    }
+    
     private let lexer: Lexer
     private var currentToken: LexerToken!
     
@@ -59,6 +69,7 @@ class Parser {
 
         _firstCollection_ = produceFirstCollection()
         _followCollection_ = produceFollowCollection()
+        _enhanceFirstCollection_ = produceEnhanceFirstCollection()
     }
     
     func produceFirstCollection() -> FirstCollection {
@@ -69,9 +80,13 @@ class Parser {
         produceFollowCollection(productions, TVS: TVS, NTVS: NTVS, firstCollection: _firstCollection_)
     }
     
+    func produceEnhanceFirstCollection() -> EnhanceFirstCollection {
+        produceEnchanceFisrtCollection(productions: productions, firstCollection: firstCollection, followCollection: followCollection)
+    }
+    
     private var _firstCollection_: FirstCollection = .init([])
     private var _followCollection_: FollowCollection = .init([])
-    private var _enhanceFirstCollection: EnhanceFirstCollection = .init([:])
+    private var _enhanceFirstCollection_: EnhanceFirstCollection = .init([:])
 }
 
 extension Parser {
@@ -175,6 +190,46 @@ extension Parser {
         let items = followCollection.map({ FollowItem(node: $0.key.node as! NonterminalNode, items: Array($0.value).map({ $0.node })) })
         
         return .init(items)
+    }
+    
+    private func produceEnchanceFisrtCollection(productions: [Production], firstCollection: FirstCollection, followCollection: FollowCollection) -> EnhanceFirstCollection {
+        var fCollection: [Production: [Node]] = [:]
+        
+        for production in productions {
+            let rightNodes = production.right
+            var rhs = Set<NodeWrapper>(firstCollection[production.right[0]].map({ NodeWrapper.with($0)}))
+            
+            var i = 0
+            if !rightNodes.contains(where: { (node) -> Bool in
+                return node.value == Epsilon.default.value
+            }) {
+                while i < (production.right.count-1), firstCollection[production.right[i]].contains(where: { (node) -> Bool in
+                    return node.value == Epsilon.default.value
+                }) {
+                    
+                    let next = Set<NodeWrapper>(firstCollection[production.right[i+1]].map({ NodeWrapper.with($0)}))
+                    rhs.formUnion(next)
+                    rhs.remove(.epsilonWrapper)
+                    i += 1
+                }
+                
+                if i == production.right.count-1, firstCollection[production.right[i]].contains(where: { (node) -> Bool in
+                    return node.value == Epsilon.default.value
+                }) {
+                    rhs.insert(.epsilonWrapper)
+                }
+            }
+            
+            if rhs.contains(where: { wrapper in
+                wrapper.node.value == Epsilon.default.value
+            }) {
+                rhs.formUnion(Set<NodeWrapper>(followCollection[production.left].map({ NodeWrapper.with($0) })))
+            }
+            
+            fCollection[production] = Array(rhs).map({ $0.node })
+        }
+        
+        return .init(fCollection)
     }
 }
 
