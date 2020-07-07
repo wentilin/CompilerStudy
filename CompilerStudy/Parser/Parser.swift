@@ -66,7 +66,7 @@ class Parser {
     }
     
     func produceFollowCollection() -> FollowCollection {
-        produceFollowCollection(productions, TVS: terminals, NTVS: nonterminals, firstCollection: _firstCollection_)
+        produceFollowCollection(productions, terminals: terminals, nonterminals: nonterminals, firstCollection: _firstCollection_)
     }
     
     func produceEnhanceFirstCollection() -> EnhanceFirstCollection {
@@ -140,11 +140,11 @@ extension Parser {
         return .init(items)
     }
     
-    private func produceFollowCollection(_ productions: [Production], TVS: [TerminalNode], NTVS: [NonterminalNode], firstCollection: FirstCollection) -> FollowCollection {
+    private func produceFollowCollection(_ productions: [Production], terminals: [TerminalNode], nonterminals: [NonterminalNode], firstCollection: FirstCollection) -> FollowCollection {
         var followCollection: [NodeWrapper: Set<NodeWrapper>] = [:]
         
         // set empty
-        for item in NTVS {
+        for item in nonterminals {
             followCollection[NodeWrapper.with(item)] = []
         }
         
