@@ -247,11 +247,12 @@ extension Parser {
 
 extension Parser {
     func parse() throws -> Bool {
-        try main()
+//        try parseByRecursiveDesent()
+        try parseByLL1()
     }
     
     /// Start parsing
-    private func main() throws -> Bool {
+    private func parseByRecursiveDesent() throws -> Bool {
         currentToken = try lexer.nextToken()
         if try expr() {
             if currentToken.type == .eof {
@@ -306,7 +307,7 @@ extension Parser {
     ///       | * Factor Term'
     ///       | e
     private func termPrime() throws -> Bool {
-        if currentToken.type == .divide || currentToken.type == .mutiply {
+        if currentToken.type == .divide || currentToken.type == .multiply {
             currentToken = try lexer.nextToken()
             
             if try factor() {
@@ -350,5 +351,66 @@ extension Parser {
     
     private func error(with reason: String) -> NSError {
         return .init(domain: "Parse failed", code: -1, userInfo: ["reason": reason])
+    }
+}
+
+extension Parser {
+    func parseByLL1() throws -> Bool {
+        print("LL(1) parse start")
+        currentToken = try lexer.nextToken()
+        var stack: [Node] = []
+        stack.append(EOFNode.default)
+        stack.append(NonterminalNode.expr)
+        
+        print("\(stack) : \(currentToken.value) \(lexer)")
+        
+        var focus = stack.last!
+        while true {
+            if focus.type == .eof, currentToken.type == .eof {
+                print("LL(1) parse end")
+                return true
+            } else if focus.type == .terminal || focus.type == .eof {
+                if let node = (focus as? TerminalNode), node.matches(currentToken)  {
+                    stack.removeLast()
+                    currentToken = try lexer.nextToken()
+                    
+                    print("\(stack) : \(currentToken.value) \(lexer)")
+                } else {
+                    throw error(with: "LL1 parse failed.[ \(focus.value) not matches \(currentToken.value) ]")
+                }
+            } else {
+                if let production = analyticTable[focus as! NonterminalNode, currentToken.node] {
+                    stack.removeLast()
+                    for i in 0..<production.right.count {
+                        let node = production.right[production.right.count - 1 - i]
+                        if node.type != .epsilon {
+                            stack.append(node)
+                        }
+                    }
+                    print("\(stack) : \(currentToken.value) \(lexer)")
+                } else {
+                    throw error(with: "LL1 parse failed.[ \(focus.value) not matches \(currentToken.value) ]")
+                }
+            }
+            
+            focus = stack.last!
+        }
+    }
+}
+
+extension TerminalNode {
+    func matches(_ token: LexerToken) -> Bool {
+        return token.type.rawValue == self.rawValue
+    }
+}
+
+extension LexerToken {
+    var node: Node {
+        switch self.type {
+        case .eof:
+            return EOFNode.default
+        default:
+            return TerminalNode(rawValue: self.type.rawValue)!
+        }
     }
 }

@@ -9,16 +9,16 @@
 import Foundation
 
 struct LexerToken {
-    enum TokenType {
-        case num
-        case name
-        case leftParenthesis
-        case rightParenthesis
-        case plus
-        case minus
-        case mutiply
-        case divide
-        case eof
+    enum TokenType: String {
+        case plus = "+"
+        case minus = "-"
+        case divide = "/"
+        case multiply = "*"
+        case num = "num"
+        case name = "name"
+        case leftParenthesis = "("
+        case rightParenthesis = ")"
+        case eof = "eof"
     }
     
     var value: Any
@@ -34,7 +34,7 @@ class Lexer {
             stack.insert(String(char), at: 0)
         }
         
-        advance()
+        currentChar = stack.last
     }
     
     func nextToken() throws -> LexerToken {
@@ -60,7 +60,7 @@ class Lexer {
             
             if char == "*" {
                 advance()
-                return .init(value: "*", type: .mutiply)
+                return .init(value: "*", type: .multiply)
             }
             
             if char == "/" {
@@ -88,7 +88,8 @@ class Lexer {
         if stack.isEmpty {
             currentChar = nil
         } else {
-            currentChar = stack.removeLast()
+            stack.removeLast()
+            currentChar = stack.last
         }
     }
     
@@ -106,5 +107,11 @@ class Lexer {
         }
         
         return Int(res)!
+    }
+}
+
+extension Lexer: CustomStringConvertible {
+    var description: String {
+        return stack.reversed().joined()
     }
 }

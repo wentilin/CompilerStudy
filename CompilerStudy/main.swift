@@ -8,7 +8,7 @@
 
 import Foundation
 
-let text = "1 + 3 - (4 - 4 * 5)"
+let text = "1 - (4 - 4 * 5)"
 let lexer = Lexer(text)
 let parser = Parser(lexer: lexer)
 print(parser.firstCollection)
