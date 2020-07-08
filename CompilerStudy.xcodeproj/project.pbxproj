@@ -14,6 +14,7 @@
 		54173F6024B3207E00A5A8A7 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F5F24B3207E00A5A8A7 /* Lexer.swift */; };
 		54173F6224B41EDF00A5A8A7 /* Production.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F6124B41EDF00A5A8A7 /* Production.swift */; };
 		54173F6424B4201200A5A8A7 /* AnalyticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F6324B4201200A5A8A7 /* AnalyticTable.swift */; };
+		54A42AB524B5A2CD005725C1 /* ParseRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A42AB424B5A2CD005725C1 /* ParseRule.swift */; };
 		D75DFE2524B0893E006F33FF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2424B0893E006F33FF /* main.swift */; };
 		D75DFE2C24B08981006F33FF /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2B24B08981006F33FF /* Parser.swift */; };
 /* End PBXBuildFile section */
@@ -38,6 +39,7 @@
 		54173F5F24B3207E00A5A8A7 /* Lexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
 		54173F6124B41EDF00A5A8A7 /* Production.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Production.swift; sourceTree = "<group>"; };
 		54173F6324B4201200A5A8A7 /* AnalyticTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticTable.swift; sourceTree = "<group>"; };
+		54A42AB424B5A2CD005725C1 /* ParseRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseRule.swift; sourceTree = "<group>"; };
 		D75DFE2124B0893E006F33FF /* CompilerStudy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CompilerStudy; sourceTree = BUILT_PRODUCTS_DIR; };
 		D75DFE2424B0893E006F33FF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D75DFE2B24B08981006F33FF /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
@@ -57,16 +59,32 @@
 		54173F5624B30C7E00A5A8A7 /* Parser */ = {
 			isa = PBXGroup;
 			children = (
-				54173F5F24B3207E00A5A8A7 /* Lexer.swift */,
-				D75DFE2B24B08981006F33FF /* Parser.swift */,
+				54A42AB324B5A1D3005725C1 /* LLParser */,
 				54173F5724B30C9A00A5A8A7 /* Node.swift */,
 				54173F5924B30CB100A5A8A7 /* NodeWrapper.swift */,
-				54173F5B24B30DD400A5A8A7 /* FirstCollection.swift */,
-				54173F5D24B30E1000A5A8A7 /* FollowCollection.swift */,
 				54173F6124B41EDF00A5A8A7 /* Production.swift */,
-				54173F6324B4201200A5A8A7 /* AnalyticTable.swift */,
+				54A42AB424B5A2CD005725C1 /* ParseRule.swift */,
 			);
 			path = Parser;
+			sourceTree = "<group>";
+		};
+		54A42AB324B5A1D3005725C1 /* LLParser */ = {
+			isa = PBXGroup;
+			children = (
+				D75DFE2B24B08981006F33FF /* Parser.swift */,
+				54173F5B24B30DD400A5A8A7 /* FirstCollection.swift */,
+				54173F5D24B30E1000A5A8A7 /* FollowCollection.swift */,
+				54173F6324B4201200A5A8A7 /* AnalyticTable.swift */,
+			);
+			path = LLParser;
+			sourceTree = "<group>";
+		};
+		54A42AB624B5A39E005725C1 /* Lexer */ = {
+			isa = PBXGroup;
+			children = (
+				54173F5F24B3207E00A5A8A7 /* Lexer.swift */,
+			);
+			path = Lexer;
 			sourceTree = "<group>";
 		};
 		D75DFE1824B0893D006F33FF = {
@@ -88,6 +106,7 @@
 		D75DFE2324B0893E006F33FF /* CompilerStudy */ = {
 			isa = PBXGroup;
 			children = (
+				54A42AB624B5A39E005725C1 /* Lexer */,
 				54173F5624B30C7E00A5A8A7 /* Parser */,
 				D75DFE2424B0893E006F33FF /* main.swift */,
 			);
@@ -157,6 +176,7 @@
 				54173F6224B41EDF00A5A8A7 /* Production.swift in Sources */,
 				D75DFE2C24B08981006F33FF /* Parser.swift in Sources */,
 				54173F6424B4201200A5A8A7 /* AnalyticTable.swift in Sources */,
+				54A42AB524B5A2CD005725C1 /* ParseRule.swift in Sources */,
 				54173F5C24B30DD400A5A8A7 /* FirstCollection.swift in Sources */,
 				D75DFE2524B0893E006F33FF /* main.swift in Sources */,
 				54173F5E24B30E1000A5A8A7 /* FollowCollection.swift in Sources */,

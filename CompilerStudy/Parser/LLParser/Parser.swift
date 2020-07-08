@@ -13,25 +13,13 @@ import Foundation
 ///       | name
 class Parser {
     /// Terminal collection
-    let terminals: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
+    let terminals: [TerminalNode] = ParseRule.default.terminals
     
     /// Nonterminal collection
-    let nonterminals: [NonterminalNode] = [.expr, .expr_, .term, .term_, .factor]
+    let nonterminals: [NonterminalNode] = ParseRule.default.nonterminals
     
     /// Proction collection
-    let productions: [Production] = [
-        Production(left: .expr, right: [NonterminalNode.term, NonterminalNode.expr_]),
-        Production(left: .expr_, right: [TerminalNode.plus, NonterminalNode.term, NonterminalNode.expr_]),
-        Production(left: .expr_, right: [TerminalNode.minus, NonterminalNode.term, NonterminalNode.expr_]),
-        Production(left: .expr_, right: [Epsilon.default]),
-        Production(left: .term, right: [NonterminalNode.factor, NonterminalNode.term_]),
-        Production(left: .term_, right: [TerminalNode.divide, NonterminalNode.factor, NonterminalNode.term_]),
-        Production(left: .term_, right: [TerminalNode.multiply, NonterminalNode.factor, NonterminalNode.term_]),
-        Production(left: .term_, right: [Epsilon.default]),
-        Production(left: .factor, right: [TerminalNode.leftParenthesis, NonterminalNode.expr, TerminalNode.rightParenthesis]),
-        Production(left: .factor, right: [TerminalNode.num]),
-        Production(left: .factor, right: [TerminalNode.name]),
-    ]
+    let productions: [Production] = ParseRule.default.productions
     
     var firstCollection: FirstCollection {
         return _firstCollection_
