@@ -23,3 +23,8 @@ do {
 } catch {
     print("Parse failed: \(error)")
 }
+
+let cc0 = LRParseCollectionConstructor.produceClosure(items: [.init(production: parser.productions[0], predictNode: EOFNode.default, stackPostion: 0)], firstCollection: parser.firstCollection)
+print(cc0)
+print(LRParseCollectionConstructor.produceGotoCollection(with: cc0, transitionNode: TerminalNode.leftParenthesis, firstCollection: parser.firstCollection))
+

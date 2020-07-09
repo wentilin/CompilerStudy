@@ -65,9 +65,9 @@
 		54173F5624B30C7E00A5A8A7 /* Parser */ = {
 			isa = PBXGroup;
 			children = (
-				54972F9724B6BFA70093AD4E /* ParserConstructor */,
-				54972F9424B6B9620093AD4E /* LRParser */,
 				54A42AB324B5A1D3005725C1 /* LLParser */,
+				54972F9424B6B9620093AD4E /* LRParser */,
+				54972F9724B6BFA70093AD4E /* ParserConstructor */,
 				54173F5724B30C9A00A5A8A7 /* Node.swift */,
 				54173F5924B30CB100A5A8A7 /* NodeWrapper.swift */,
 				54173F6124B41EDF00A5A8A7 /* Production.swift */,

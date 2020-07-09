@@ -33,22 +33,22 @@ class ParseCollectionConstructor {
             hasChanged = false
             for production in productions {
                 let rightNodes = production.right
-                var rhs = fCollection[NodeWrapper.with(production.right[0])]!
+                var rhs = fCollection[NodeWrapper.with(rightNodes[0])]!
                 rhs.remove(NodeWrapper.epsilonWrapper)
                 var i = 0
                 if !rightNodes.contains(where: { (node) -> Bool in
                     return node.value == Epsilon.default.value
                 }) {
-                    while i < (production.right.count-1), fCollection[NodeWrapper.with(production.right[i])]!.contains(NodeWrapper.epsilonWrapper) {
+                    while i < (rightNodes.count-1), fCollection[NodeWrapper.with(rightNodes[i])]!.contains(NodeWrapper.epsilonWrapper) {
                         
-                        let next = fCollection[NodeWrapper.with(production.right[i+1])]!
+                        let next = fCollection[NodeWrapper.with(rightNodes[i+1])]!
                         rhs.formUnion(next)
                         rhs.remove(.epsilonWrapper)
                         i += 1
                     }
                 }
                 
-                if i == production.right.count-1, fCollection[NodeWrapper.with(production.right[i])]!.contains(NodeWrapper.epsilonWrapper) {
+                if i == production.right.count-1, fCollection[NodeWrapper.with(rightNodes[i])]!.contains(NodeWrapper.epsilonWrapper) {
                     rhs.insert(.epsilonWrapper)
                 }
                 
@@ -111,28 +111,51 @@ class ParseCollectionConstructor {
         return .init(items)
     }
     
+    static func produceFirstCollection(nodes: [Node], firstCollection: FirstCollection) -> [Node] {
+        var rhs = Set<NodeWrapper>(firstCollection[nodes[0]].map({ NodeWrapper.with($0) }))
+        rhs.remove(NodeWrapper.epsilonWrapper)
+        var i = 0
+        if !nodes.contains(where: { (node) -> Bool in
+            return node.value == Epsilon.default.value
+        }) {
+            while i < (nodes.count-1), firstCollection[nodes[i]].contains(where: { $0.value == Epsilon.default.value }) {
+                
+                let next = Set<NodeWrapper>(firstCollection[nodes[i+1]].map({ NodeWrapper.with($0) }))
+                rhs.formUnion(next)
+                rhs.remove(.epsilonWrapper)
+                i += 1
+            }
+        }
+        
+        if i == nodes.count-1, firstCollection[nodes[i]].contains(where: { $0.value == Epsilon.default.value }) {
+            rhs.insert(.epsilonWrapper)
+        }
+        
+        return Array(rhs).map({ $0.node })
+    }
+    
     static func produceEnchanceFisrtCollection(productions: [Production], firstCollection: FirstCollection, followCollection: FollowCollection) -> EnhanceFirstCollection {
         var fCollection: [Production: [Node]] = [:]
         
         for production in productions {
             let rightNodes = production.right
-            var rhs = Set<NodeWrapper>(firstCollection[production.right[0]].map({ NodeWrapper.with($0)}))
+            var rhs = Set<NodeWrapper>(firstCollection[rightNodes[0]].map({ NodeWrapper.with($0)}))
             
             var i = 0
             if !rightNodes.contains(where: { (node) -> Bool in
                 return node.value == Epsilon.default.value
             }) {
-                while i < (production.right.count-1), firstCollection[production.right[i]].contains(where: { (node) -> Bool in
+                while i < (rightNodes.count-1), firstCollection[rightNodes[i]].contains(where: { (node) -> Bool in
                     return node.value == Epsilon.default.value
                 }) {
                     
-                    let next = Set<NodeWrapper>(firstCollection[production.right[i+1]].map({ NodeWrapper.with($0)}))
+                    let next = Set<NodeWrapper>(firstCollection[rightNodes[i+1]].map({ NodeWrapper.with($0)}))
                     rhs.formUnion(next)
                     rhs.remove(.epsilonWrapper)
                     i += 1
                 }
                 
-                if i == production.right.count-1, firstCollection[production.right[i]].contains(where: { (node) -> Bool in
+                if i == production.right.count-1, firstCollection[rightNodes[i]].contains(where: { (node) -> Bool in
                     return node.value == Epsilon.default.value
                 }) {
                     rhs.insert(.epsilonWrapper)
