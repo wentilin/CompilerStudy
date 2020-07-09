@@ -186,7 +186,7 @@ extension Parser {
         currentToken = try lexer.nextToken()
         var stack: [Node] = []
         stack.append(EOFNode.default)
-        stack.append(NonterminalNode.expr)
+        stack.append(productions[0].left)
         
         print("\(stack) : \(currentToken.value) \(lexer)")
         

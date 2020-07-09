@@ -33,6 +33,7 @@ extension Node {
 
 /// Nonterminal node
 enum NonterminalNode: String, Node {
+    case goal = "goal"
     case expr = "expr"
     case expr_ = "expr_"
     case term = "term"
