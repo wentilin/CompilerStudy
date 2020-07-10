@@ -13,7 +13,7 @@
 		54173F5E24B30E1000A5A8A7 /* FollowCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F5D24B30E1000A5A8A7 /* FollowCollection.swift */; };
 		54173F6024B3207E00A5A8A7 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F5F24B3207E00A5A8A7 /* Lexer.swift */; };
 		54173F6224B41EDF00A5A8A7 /* Production.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F6124B41EDF00A5A8A7 /* Production.swift */; };
-		54173F6424B4201200A5A8A7 /* AnalyticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F6324B4201200A5A8A7 /* AnalyticTable.swift */; };
+		54173F6424B4201200A5A8A7 /* LLAnalyticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54173F6324B4201200A5A8A7 /* LLAnalyticTable.swift */; };
 		54972F9624B6BE8F0093AD4E /* ParseCollectionConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972F9524B6BE8F0093AD4E /* ParseCollectionConstructor.swift */; };
 		54972F9924B6BFD20093AD4E /* LLParseCollectionConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972F9824B6BFD20093AD4E /* LLParseCollectionConstructor.swift */; };
 		54972F9B24B6C2E60093AD4E /* LRParseCollectionConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972F9A24B6C2E60093AD4E /* LRParseCollectionConstructor.swift */; };
@@ -43,7 +43,7 @@
 		54173F5D24B30E1000A5A8A7 /* FollowCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowCollection.swift; sourceTree = "<group>"; };
 		54173F5F24B3207E00A5A8A7 /* Lexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
 		54173F6124B41EDF00A5A8A7 /* Production.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Production.swift; sourceTree = "<group>"; };
-		54173F6324B4201200A5A8A7 /* AnalyticTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticTable.swift; sourceTree = "<group>"; };
+		54173F6324B4201200A5A8A7 /* LLAnalyticTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLAnalyticTable.swift; sourceTree = "<group>"; };
 		54972F9524B6BE8F0093AD4E /* ParseCollectionConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParseCollectionConstructor.swift; sourceTree = "<group>"; };
 		54972F9824B6BFD20093AD4E /* LLParseCollectionConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLParseCollectionConstructor.swift; sourceTree = "<group>"; };
 		54972F9A24B6C2E60093AD4E /* LRParseCollectionConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRParseCollectionConstructor.swift; sourceTree = "<group>"; };
@@ -104,7 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				D75DFE2B24B08981006F33FF /* LLParser.swift */,
-				54173F6324B4201200A5A8A7 /* AnalyticTable.swift */,
+				54173F6324B4201200A5A8A7 /* LLAnalyticTable.swift */,
 				54972F9824B6BFD20093AD4E /* LLParseCollectionConstructor.swift */,
 			);
 			path = LLParser;
@@ -206,7 +206,7 @@
 				54173F6024B3207E00A5A8A7 /* Lexer.swift in Sources */,
 				54173F6224B41EDF00A5A8A7 /* Production.swift in Sources */,
 				D75DFE2C24B08981006F33FF /* LLParser.swift in Sources */,
-				54173F6424B4201200A5A8A7 /* AnalyticTable.swift in Sources */,
+				54173F6424B4201200A5A8A7 /* LLAnalyticTable.swift in Sources */,
 				54A42AB524B5A2CD005725C1 /* ParserBuilder.swift in Sources */,
 				54972F9D24B80F530093AD4E /* Parser.swift in Sources */,
 				54972F9924B6BFD20093AD4E /* LLParseCollectionConstructor.swift in Sources */,

@@ -34,7 +34,7 @@ class LLParser: Parser {
         return _enhanceFirstCollection_
     }
     
-    var analyticTable: AnalyticTable {
+    var analyticTable: LLAnalyticTable {
         return _analyticTable_
     }
     
@@ -51,7 +51,7 @@ class LLParser: Parser {
         _firstCollection_ = produceFirstCollection()
         _followCollection_ = produceFollowCollection()
         _enhanceFirstCollection_ = produceEnhanceFirstCollection()
-        _analyticTable_ = produceAnalyticTable()
+        _analyticTable_ = produceLLAnalyticTable()
     }
     
     func produceFirstCollection() -> FirstCollection {
@@ -66,7 +66,7 @@ class LLParser: Parser {
         LLParseCollectionConstructor.produceEnchanceFisrtCollection(productions: productions, firstCollection: firstCollection, followCollection: followCollection)
     }
     
-    func produceAnalyticTable() -> AnalyticTable {
+    func produceLLAnalyticTable() -> LLAnalyticTable {
         LLParseCollectionConstructor.produceAnalyticTable(productions: productions, nonterminals: nonterminals, enhanceFirstCollection: enhanceFirstCollection)
     }
     
@@ -78,7 +78,7 @@ class LLParser: Parser {
     private var _firstCollection_: FirstCollection = .init([])
     private var _followCollection_: FollowCollection = .init([])
     private var _enhanceFirstCollection_: EnhanceFirstCollection = .init([:])
-    private var _analyticTable_: AnalyticTable = .init()
+    private var _analyticTable_: LLAnalyticTable = .init()
 }
 
 extension LLParser {

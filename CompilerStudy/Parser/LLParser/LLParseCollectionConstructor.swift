@@ -9,8 +9,8 @@
 import Foundation
 
 class LLParseCollectionConstructor: ParseCollectionConstructor {
-    static func produceAnalyticTable(productions: [Production], nonterminals: [NonterminalNode], enhanceFirstCollection: EnhanceFirstCollection) -> AnalyticTable {
-        var table = AnalyticTable()
+    static func produceAnalyticTable(productions: [Production], nonterminals: [NonterminalNode], enhanceFirstCollection: EnhanceFirstCollection) -> LLAnalyticTable {
+        var table = LLAnalyticTable()
         
         for production in productions {
             for node in enhanceFirstCollection[production] {

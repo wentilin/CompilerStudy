@@ -1,5 +1,5 @@
 //
-//  AnalyticTable.swift
+//  LLAnalyticTable.swift
 //  CompilerStudy
 //
 //  Created by linwenhu on 2020/7/7.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct AnalyticTable: CustomStringConvertible {
+struct LLAnalyticTable: CustomStringConvertible {
     private var table: [NonterminalNode: [NodeWrapper: Production]] = [:]
     
     subscript(nontermianl: NonterminalNode, node: Node) -> Production? {
