@@ -73,7 +73,7 @@ extension LRConanicalCollection: CustomStringConvertible {
 }
 
 class LRParseCollectionConstructor: ParseCollectionConstructor {
-    static func produceClosure(items: [LRConanicalItem], firstCollection: FirstCollection) -> LRConanicalCollection {
+    static func produceClosure(productions: [Production], items: [LRConanicalItem], firstCollection: FirstCollection) -> LRConanicalCollection {
         var hasChanged = true
         var res = Set<LRConanicalItem>(items)
         while hasChanged {
@@ -83,9 +83,10 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
                 let nodes = item.production.right
                 if item.stackPostion <= nodes.count - 1 {
                     if let nonterminalNode = nodes[item.stackPostion] as? NonterminalNode {
-                        let firstCollection = ParseCollectionConstructor.produceFirstCollection(nodes: Array(nodes[item.stackPostion..<nodes.count] + [item.predictNode]), firstCollection: firstCollection)
-                        for p in ParseRule.default.production(with: nonterminalNode) {
-                            for node in firstCollection {
+                        let _firstCollection = ParseCollectionConstructor.produceFirstCollection(nodes: Array(nodes[item.stackPostion+1..<nodes.count] + [item.predictNode]), firstCollection: firstCollection)
+                        let _productions = productions.filter({ $0.left.value == nonterminalNode.value })
+                        for p in _productions {
+                            for node in _firstCollection {
                                 rhs.insert(.init(production: p, predictNode: node, stackPostion: 0))
                             }
                         }
@@ -102,7 +103,7 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
         return .init(items: res.map({ $0 }))
     }
     
-    static func produceGotoCollection(with conanicalCollection: LRConanicalCollection, transitionNode: Node, firstCollection: FirstCollection) -> LRConanicalCollection {
+    static func produceGotoCollection(productions: [Production], conanicalCollection: LRConanicalCollection, transitionNode: Node, firstCollection: FirstCollection) -> LRConanicalCollection {
         var moved: Set<LRConanicalItem> = []
         for item in conanicalCollection {
             if let node = item.stackNode, node.value == transitionNode.value {
@@ -110,6 +111,6 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
             }
         }
         
-        return produceClosure(items: moved.map{ $0 }, firstCollection: firstCollection)
+        return produceClosure(productions: productions, items: moved.map{ $0 }, firstCollection: firstCollection)
     }
 }

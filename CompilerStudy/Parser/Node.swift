@@ -40,6 +40,10 @@ enum NonterminalNode: String, Node {
     case term_ = "term_"
     case factor = "factor"
     
+    // Bracket grammer node
+    case list = "list"
+    case pair = "pair"
+    
     var value: String { rawValue }
     var type: NodeType { .nonterminal }
 }

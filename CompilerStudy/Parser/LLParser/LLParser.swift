@@ -12,15 +12,15 @@ import Foundation
 /// Factor -> ( Expr )
 ///       | num
 ///       | name
-class Parser {
+class LLParser: Parser {
     /// Terminal collection
-    let terminals: [TerminalNode] = ParseRule.default.terminals
+    var terminals: [TerminalNode]
     
     /// Nonterminal collection
-    let nonterminals: [NonterminalNode] = ParseRule.default.nonterminals
+    var nonterminals: [NonterminalNode]
     
     /// Proction collection
-    let productions: [Production] = ParseRule.default.productions
+    var productions: [Production]
     
     var firstCollection: FirstCollection {
         return _firstCollection_
@@ -41,9 +41,13 @@ class Parser {
     private let lexer: Lexer
     private var currentToken: LexerToken!
     
-    init(lexer: Lexer) {
+    init(lexer: Lexer, terminals: [TerminalNode], nonterminals: [NonterminalNode], productions: [Production]) {
         self.lexer = lexer
 
+        self.terminals = terminals
+        self.nonterminals = nonterminals
+        self.productions = productions
+        
         _firstCollection_ = produceFirstCollection()
         _followCollection_ = produceFollowCollection()
         _enhanceFirstCollection_ = produceEnhanceFirstCollection()
@@ -66,18 +70,18 @@ class Parser {
         LLParseCollectionConstructor.produceAnalyticTable(productions: productions, nonterminals: nonterminals, enhanceFirstCollection: enhanceFirstCollection)
     }
     
+    func parse() throws -> Bool {
+    //        try parseByRecursiveDesent()
+            try parseByLL1()
+    }
+    
     private var _firstCollection_: FirstCollection = .init([])
     private var _followCollection_: FollowCollection = .init([])
     private var _enhanceFirstCollection_: EnhanceFirstCollection = .init([:])
     private var _analyticTable_: AnalyticTable = .init()
 }
 
-extension Parser {
-    func parse() throws -> Bool {
-//        try parseByRecursiveDesent()
-        try parseByLL1()
-    }
-    
+extension LLParser {
     /// Start parsing
     private func parseByRecursiveDesent() throws -> Bool {
         currentToken = try lexer.nextToken()
@@ -181,7 +185,7 @@ extension Parser {
     }
 }
 
-extension Parser {
+extension LLParser {
     func parseByLL1() throws -> Bool {
         print("LL(1) parse start")
         currentToken = try lexer.nextToken()
