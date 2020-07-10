@@ -6,71 +6,7 @@
 //  Copyright © 2020 wentilin. All rights reserved.
 //
 
-import Cocoa
-
-struct LRConanicalItem: Hashable, CustomStringConvertible {
-    let production: Production
-    let predictNode: Node
-    let stackPostion: Int
-    
-    var stackNode: Node? {
-        if stackPostion <= production.right.count {
-            return production.right[stackPostion]
-        }
-        
-        return nil
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(production)
-        hasher.combine(predictNode.value)
-        hasher.combine(stackPostion)
-    }
-    
-    static func == (lhs: LRConanicalItem, rhs: LRConanicalItem) -> Bool {
-        return lhs.production == rhs.production &&
-            lhs.predictNode.value == rhs.predictNode.value &&
-            lhs.stackPostion == rhs.stackPostion
-    }
-    
-    var description: String {
-        var str = "<"
-        str += production.left.value
-        str += " -> "
-        var nodes = production.right.map({ $0.value })
-        nodes.insert("·", at: stackPostion)
-        str += nodes.joined(separator: " ")
-        str += "[\(production.order)]"
-        str += ", \(predictNode.value)"
-        str += ">"
-        
-        return str
-    }
-}
-
-struct LRConanicalCollection: Sequence {
-    private var items: [LRConanicalItem]
-    
-    init(items: [LRConanicalItem]) {
-        self.items = items
-    }
-    
-    typealias Iterator  = AnyIterator<LRConanicalItem>
-    
-    func makeIterator() -> AnyIterator<LRConanicalItem> {
-        var innerIterator = items.makeIterator()
-
-        return AnyIterator { () -> LRConanicalItem? in
-            return innerIterator.next()
-        }
-    }
-}
-
-extension LRConanicalCollection: CustomStringConvertible {
-    var description: String {
-        return "\(items.sorted{ $0.production.order < $1.production.order })"
-    }
-}
+import Foundation
 
 class LRParseCollectionConstructor: ParseCollectionConstructor {
     static func produceClosure(productions: [Production], items: [LRConanicalItem], firstCollection: FirstCollection) -> LRConanicalCollection {

@@ -19,6 +19,7 @@
 		54972F9B24B6C2E60093AD4E /* LRParseCollectionConstructor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972F9A24B6C2E60093AD4E /* LRParseCollectionConstructor.swift */; };
 		54972F9D24B80F530093AD4E /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972F9C24B80F530093AD4E /* Parser.swift */; };
 		54972F9F24B813090093AD4E /* LRParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972F9E24B813090093AD4E /* LRParser.swift */; };
+		54972FA324B86E370093AD4E /* LRConanicalCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54972FA224B86E370093AD4E /* LRConanicalCollection.swift */; };
 		54A42AB524B5A2CD005725C1 /* ParserBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A42AB424B5A2CD005725C1 /* ParserBuilder.swift */; };
 		D75DFE2524B0893E006F33FF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2424B0893E006F33FF /* main.swift */; };
 		D75DFE2C24B08981006F33FF /* LLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2B24B08981006F33FF /* LLParser.swift */; };
@@ -49,6 +50,7 @@
 		54972F9A24B6C2E60093AD4E /* LRParseCollectionConstructor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRParseCollectionConstructor.swift; sourceTree = "<group>"; };
 		54972F9C24B80F530093AD4E /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		54972F9E24B813090093AD4E /* LRParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRParser.swift; sourceTree = "<group>"; };
+		54972FA224B86E370093AD4E /* LRConanicalCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRConanicalCollection.swift; sourceTree = "<group>"; };
 		54A42AB424B5A2CD005725C1 /* ParserBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserBuilder.swift; sourceTree = "<group>"; };
 		D75DFE2124B0893E006F33FF /* CompilerStudy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CompilerStudy; sourceTree = BUILT_PRODUCTS_DIR; };
 		D75DFE2424B0893E006F33FF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			children = (
 				54972F9A24B6C2E60093AD4E /* LRParseCollectionConstructor.swift */,
 				54972F9E24B813090093AD4E /* LRParser.swift */,
+				54972FA224B86E370093AD4E /* LRConanicalCollection.swift */,
 			);
 			path = LRParser;
 			sourceTree = "<group>";
@@ -210,6 +213,7 @@
 				54A42AB524B5A2CD005725C1 /* ParserBuilder.swift in Sources */,
 				54972F9D24B80F530093AD4E /* Parser.swift in Sources */,
 				54972F9924B6BFD20093AD4E /* LLParseCollectionConstructor.swift in Sources */,
+				54972FA324B86E370093AD4E /* LRConanicalCollection.swift in Sources */,
 				54972F9B24B6C2E60093AD4E /* LRParseCollectionConstructor.swift in Sources */,
 				54173F5C24B30DD400A5A8A7 /* FirstCollection.swift in Sources */,
 				D75DFE2524B0893E006F33FF /* main.swift in Sources */,
