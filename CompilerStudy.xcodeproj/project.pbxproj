@@ -23,6 +23,7 @@
 		54A42AB524B5A2CD005725C1 /* ParserBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54A42AB424B5A2CD005725C1 /* ParserBuilder.swift */; };
 		D75DFE2524B0893E006F33FF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2424B0893E006F33FF /* main.swift */; };
 		D75DFE2C24B08981006F33FF /* LLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2B24B08981006F33FF /* LLParser.swift */; };
+		D75DFE2E24B9E774006F33FF /* LRAnalyticTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75DFE2D24B9E774006F33FF /* LRAnalyticTable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,6 +56,7 @@
 		D75DFE2124B0893E006F33FF /* CompilerStudy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CompilerStudy; sourceTree = BUILT_PRODUCTS_DIR; };
 		D75DFE2424B0893E006F33FF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D75DFE2B24B08981006F33FF /* LLParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LLParser.swift; sourceTree = "<group>"; };
+		D75DFE2D24B9E774006F33FF /* LRAnalyticTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRAnalyticTable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				54972F9A24B6C2E60093AD4E /* LRParseCollectionConstructor.swift */,
 				54972F9E24B813090093AD4E /* LRParser.swift */,
 				54972FA224B86E370093AD4E /* LRConanicalCollection.swift */,
+				D75DFE2D24B9E774006F33FF /* LRAnalyticTable.swift */,
 			);
 			path = LRParser;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				54173F5C24B30DD400A5A8A7 /* FirstCollection.swift in Sources */,
 				D75DFE2524B0893E006F33FF /* main.swift in Sources */,
 				54972F9624B6BE8F0093AD4E /* ParseCollectionConstructor.swift in Sources */,
+				D75DFE2E24B9E774006F33FF /* LRAnalyticTable.swift in Sources */,
 				54972F9F24B813090093AD4E /* LRParser.swift in Sources */,
 				54173F5E24B30E1000A5A8A7 /* FollowCollection.swift in Sources */,
 				54173F5A24B30CB100A5A8A7 /* NodeWrapper.swift in Sources */,
@@ -344,7 +348,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8VBF894SB3;
+				DEVELOPMENT_TEAM = 4EG25ZT9T6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -355,7 +359,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8VBF894SB3;
+				DEVELOPMENT_TEAM = 4EG25ZT9T6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

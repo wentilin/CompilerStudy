@@ -22,6 +22,18 @@ class LRParser: Parser {
         return _firstCollection_
     }
     
+    var collectionSet: LRConanicalCollectionSet {
+        return _collectionSet_
+    }
+    
+    var gotoCollection: LRConanicalGotoCollection {
+        return _gotoCollection_
+    }
+    
+    var analyticTable: LRAnalyticTable {
+        return _analyticTable_
+    }
+    
     private let lexer: Lexer
     private var currentToken: LexerToken!
     
@@ -32,7 +44,10 @@ class LRParser: Parser {
         self.nonterminals = nonterminals
         self.productions = productions
         
-        _firstCollection_ = LLParseCollectionConstructor.produceFirstCollection(productions, terminals: terminals, nonterminals: nonterminals)
+        _firstCollection_ = LRParseCollectionConstructor.produceFirstCollection(productions, terminals: terminals, nonterminals: nonterminals)
+        (_collectionSet_, _gotoCollection_) = LRParseCollectionConstructor.produceConanicalCollectionSet(productions: productions, firstCollection: _firstCollection_)
+        _analyticTable_ = LRParseCollectionConstructor.produceAnalyticTable(collectionSet: _collectionSet_, gotoCollection: _gotoCollection_, nonterminals: nonterminals)
+        
     }
     
     func parse() throws -> Bool {
@@ -40,4 +55,7 @@ class LRParser: Parser {
     }
     
     private var _firstCollection_: FirstCollection = .init([])
+    private var _analyticTable_: LRAnalyticTable
+    private var _collectionSet_: LRConanicalCollectionSet
+    private var _gotoCollection_: LRConanicalGotoCollection
 }

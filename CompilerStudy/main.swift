@@ -30,10 +30,7 @@ do {
 print("-----------------LR(1)-----------------")
 
 let lrParser = ParserBuilder.buildLRParser(lexer: lexer)
-
-let cc0 = LRParseCollectionConstructor.produceClosure(productions: lrParser.productions, items: [.init(production: lrParser.productions[0], predictNode: EOFNode.default, stackPostion: 0)], firstCollection: lrParser.firstCollection)
-print("CC0: \(cc0)")
-
-let goto0 = LRParseCollectionConstructor.produceGotoCollection(productions: lrParser.productions, conanicalCollection: cc0, transitionNode: TerminalNode.leftParenthesis, firstCollection: lrParser.firstCollection)
-print("GOTO<\(TerminalNode.leftParenthesis)>: \(goto0)")
+print("GOTOs:\(lrParser.gotoCollection)")
+print("CollectionSet:\(lrParser.collectionSet)")
+print("\(lrParser.analyticTable)")
 

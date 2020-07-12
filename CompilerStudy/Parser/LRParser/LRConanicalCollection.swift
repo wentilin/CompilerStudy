@@ -15,7 +15,7 @@ struct LRConanicalItem: Hashable, CustomStringConvertible {
     let stackPostion: Int
     
     var stackNode: Node? {
-        if stackPostion <= production.right.count {
+        if stackPostion < production.right.count {
             return production.right[stackPostion]
         }
         
@@ -50,11 +50,18 @@ struct LRConanicalItem: Hashable, CustomStringConvertible {
 }
 
 // MARK: -LRConanicalCollection
-struct LRConanicalCollection: Sequence, Equatable {
-    private var items: [LRConanicalItem]
+struct LRConanicalCollection: Sequence, Equatable, Hashable {
+    private var items: Set<LRConanicalItem>
     
-    init(items: [LRConanicalItem]) {
-        self.items = items
+    var order: Int
+    
+    var count: Int { return items.count }
+    
+    var isEmpty: Bool { return items.isEmpty }
+    
+    init(items: [LRConanicalItem], order: Int) {
+        self.items = Set<LRConanicalItem>(items)
+        self.order = order
     }
     
     typealias Iterator  = AnyIterator<LRConanicalItem>
@@ -66,24 +73,90 @@ struct LRConanicalCollection: Sequence, Equatable {
             return innerIterator.next()
         }
     }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.items == rhs.items
+    }
 }
 
 extension LRConanicalCollection: CustomStringConvertible {
     var description: String {
-        return "\(items.sorted{ $0.production.order < $1.production.order })"
+        return "<\(order)>\(items.sorted{ $0.production.order < $1.production.order })"
     }
 }
 
-struct LRConanicalCollectionSet {
+// MARK: -LRConanicalCollectionSet
+struct LRConanicalCollectionSet: Sequence, CustomStringConvertible {
     var conanicalCollections: [LRConanicalCollection]
     
     func contains(_ conanicalCollection: LRConanicalCollection) -> Bool {
         return conanicalCollections.contains(where: { $0 == conanicalCollection })
     }
+    
+    var description: String {
+        return "\(conanicalCollections.map({ "\($0)" }).joined(separator: "\n"))"
+    }
+    
+    func makeIterator() -> AnyIterator<LRConanicalCollection> {
+        var innerIterator = conanicalCollections.makeIterator()
+
+        return AnyIterator { () -> LRConanicalCollection? in
+            return innerIterator.next()
+        }
+    }
 }
 
+
+
 // MARK: -LRConanicalGotoItem
-struct LRConanicalGotoItem {
+struct LRConanicalGotoKey: Hashable, CustomStringConvertible {
+    let collection: LRConanicalCollection
     let node: Node
-    let conanicalCollection: LRConanicalCollection
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(collection)
+        hasher.combine(node.value)
+    }
+    
+    static func == (lhs: LRConanicalGotoKey, rhs: LRConanicalGotoKey) -> Bool {
+        return lhs.collection == rhs.collection && lhs.node.value == rhs.node.value
+    }
+    
+    var description: String {
+        return "goto_key<\(collection.order), \(node.value)>"
+    }
+}
+
+struct LRConanicalGotoCollection: Sequence, CustomStringConvertible {
+    private var items: [LRConanicalGotoKey: LRConanicalCollection] = [:]
+    
+    subscript(gotoKey: LRConanicalGotoKey) -> LRConanicalCollection? {
+        get {
+            return items[gotoKey]
+        } set {
+            items[gotoKey] = newValue
+        }
+    }
+    
+    subscript(collectoin: LRConanicalCollection, node: Node) -> LRConanicalCollection? {
+        get {
+            return items[.init(collection: collectoin, node: node)]
+        } set {
+            items[.init(collection: collectoin, node: node)] = newValue
+        }
+    }
+    
+    func makeIterator() -> AnyIterator<(LRConanicalGotoKey, LRConanicalCollection)> {
+        var innerIterator = items.makeIterator()
+
+        return AnyIterator { () -> (LRConanicalGotoKey, LRConanicalCollection)? in
+            return innerIterator.next()
+        }
+    }
+    
+    var description: String {
+        let res = items.map({($0.key, $0.value)}).sorted(by: { $0.0.collection.order < $1.0.collection.order }).map({"\($0.0): \($0.1.order)"}).joined(separator: "\n")
+        
+        return "\(res)"
+    }
 }
