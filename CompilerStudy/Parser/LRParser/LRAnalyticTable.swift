@@ -10,7 +10,7 @@ import Foundation
 
 enum LRAnalyticActionType: CustomStringConvertible {
     case shift(order: Int)
-    case reduce(productionOrder: Int)
+    case reduce(production: Production)
     case accept
     
     var description: String {

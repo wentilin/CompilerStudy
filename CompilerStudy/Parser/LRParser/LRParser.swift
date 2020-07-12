@@ -51,7 +51,42 @@ class LRParser: Parser {
     }
     
     func parse() throws -> Bool {
-        return true
+        var stack: [Any] = []
+        stack.append(EOFNode.default)
+        stack.append(collectionSet[0].order)
+        currentToken = try lexer.nextToken()
+        
+        print(stack)
+        
+        while true {
+            var state = stack.last as! Int
+            let actionType = analyticTable.actionCollection[state, currentToken.node]
+            switch actionType {
+            case .shift(let order):
+                stack.append(currentToken.node)
+                stack.append(order)
+                currentToken = try lexer.nextToken()
+                break
+            case .reduce(let production):
+                for _ in 0..<2*production.right.count {
+                    stack.removeLast()
+                }
+                state = stack.last as! Int
+                stack.append(production.left)
+                guard let goto = analyticTable.gotos[state, production.left] else {
+                    throw NSError(domain: "LR(1) parse fail.", code: -1, userInfo: ["info": "goto<\(state), \(production.left.value)> not found"])
+                }
+                
+                stack.append(goto)
+                break
+            case .accept:
+                return true
+            case .none:
+                throw NSError(domain: "LR(1) parse fail.", code: -1, userInfo: nil)
+            }
+            
+            print(stack)
+        }
     }
     
     private var _firstCollection_: FirstCollection = .init([])

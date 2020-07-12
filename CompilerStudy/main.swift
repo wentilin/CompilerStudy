@@ -29,8 +29,18 @@ do {
 
 print("-----------------LR(1)-----------------")
 
-let lrParser = ParserBuilder.buildLRParser(lexer: lexer)
+let _text = "(())"
+let _lexer = Lexer(_text)
+let lrParser = ParserBuilder.buildLRParser(lexer: _lexer)
 print("GOTOs:\(lrParser.gotoCollection)")
 print("CollectionSet:\(lrParser.collectionSet)")
 print("\(lrParser.analyticTable)")
+
+print("Begin parse: \(text)")
+do {
+    let result = try lrParser.parse()
+    print("Parse result: \(result)")
+} catch {
+    print("Parse failed: \(error)")
+}
 

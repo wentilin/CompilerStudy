@@ -86,15 +86,27 @@ extension LRConanicalCollection: CustomStringConvertible {
 }
 
 // MARK: -LRConanicalCollectionSet
-struct LRConanicalCollectionSet: Sequence, CustomStringConvertible {
-    var conanicalCollections: [LRConanicalCollection]
+struct LRConanicalCollectionSet: Collection, CustomStringConvertible {
+    private var conanicalCollections: [LRConanicalCollection]
+    
+    var startIndex: Int { return conanicalCollections.startIndex }
+    
+    var endIndex: Int { return conanicalCollections.startIndex }
+    
+    init(conanicalCollections: [LRConanicalCollection]) {
+        self.conanicalCollections = conanicalCollections
+    }
+    
+    func index(after i: Int) -> Int {
+        return i + 1
+    }
+    
+    subscript(position: Int) -> LRConanicalCollection {
+        return conanicalCollections[position]
+    }
     
     func contains(_ conanicalCollection: LRConanicalCollection) -> Bool {
         return conanicalCollections.contains(where: { $0 == conanicalCollection })
-    }
-    
-    var description: String {
-        return "\(conanicalCollections.map({ "\($0)" }).joined(separator: "\n"))"
     }
     
     func makeIterator() -> AnyIterator<LRConanicalCollection> {
@@ -103,6 +115,10 @@ struct LRConanicalCollectionSet: Sequence, CustomStringConvertible {
         return AnyIterator { () -> LRConanicalCollection? in
             return innerIterator.next()
         }
+    }
+    
+    var description: String {
+        return "\(conanicalCollections.map({ "\($0)" }).joined(separator: "\n"))"
     }
 }
 

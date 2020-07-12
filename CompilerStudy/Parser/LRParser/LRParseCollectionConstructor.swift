@@ -100,10 +100,12 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
                 if let stackNode = item.stackNode,
                     let goto = gotoCollection[cc, stackNode] { // [A -> B•C, a], shift
                     analyticTable.actionCollection[cc.order, stackNode] = .shift(order: goto.order)
-                } else if item.stackNode == nil { // [A -> B•, a], reduce
-                    analyticTable.actionCollection[cc.order, item.predictNode] = .reduce(productionOrder: item.production.order)
+                } else if item.stackNode == nil,
+                    item.production.order != 0 { // [A -> B•, a], reduce
+                    analyticTable.actionCollection[cc.order, item.predictNode] = .reduce(production: item.production)
                 } else if item.production.order == 0,
-                    item.predictNode.value == EOFNode.default.value { // accept
+                    item.stackNode == nil,
+                    item.predictNode.value == EOFNode.default.value { // [S` -> S•, eof], accept
                     analyticTable.actionCollection[cc.order, EOFNode.default] = .accept
                 }
             }
