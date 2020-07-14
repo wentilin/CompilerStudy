@@ -29,14 +29,14 @@ do {
 
 print("-----------------LR(1)-----------------")
 
-let _text = "(())"
+let _text = "1+(1+2)*2-4-(2/2)"
 let _lexer = Lexer(_text)
 let lrParser = ParserBuilder.buildLRParser(lexer: _lexer)
-print("GOTOs:\(lrParser.gotoCollection)")
+print("GOTOs\n:\(lrParser.gotoCollection)")
 print("CollectionSet:\(lrParser.collectionSet)")
 print("\(lrParser.analyticTable)")
 
-print("Begin parse: \(text)")
+print("Begin parse: \(_text)")
 do {
     let result = try lrParser.parse()
     print("Parse result: \(result)")

@@ -68,9 +68,10 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
                         transitionNode: transitionNode,
                         firstCollection: firstCollection, order: order)
                         
-                        if !temp.isEmpty, !ccSet.contains(where: { (cc, _) -> Bool in
+                        let cc_ = ccSet.first(where: { (cc, _) -> Bool in
                             return cc == temp
-                        }){
+                        })
+                        if !temp.isEmpty, cc_ == nil {
                             ccSet.append((temp, false))
                             hasChanged = true
                             
@@ -79,7 +80,7 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
                         
                         let key = LRConanicalGotoKey(collection: ccSet[i].cc, node: transitionNode)
                         if !temp.isEmpty, gotoCollection[key] == nil {
-                            gotoCollection[key] = temp
+                            gotoCollection[key] = cc_?.cc ?? temp
                         }
                     }
                 }
@@ -99,9 +100,29 @@ class LRParseCollectionConstructor: ParseCollectionConstructor {
             for item in cc {
                 if let stackNode = item.stackNode,
                     let goto = gotoCollection[cc, stackNode] { // [A -> B•C, a], shift
+                    if let action = analyticTable.actionCollection[cc.order, stackNode] {
+                        switch action {
+                        case .shift(let order):
+                            if order != goto.order {
+                                print("action conflict(shift \(goto.order)): <\(cc.order), \(stackNode.value)>")
+                            }
+                        default:
+                            break
+                        }
+                    }
                     analyticTable.actionCollection[cc.order, stackNode] = .shift(order: goto.order)
                 } else if item.stackNode == nil,
                     item.production.order != 0 { // [A -> B•, a], reduce
+                    if let action = analyticTable.actionCollection[cc.order, item.predictNode] {
+                        switch action {
+                        case .reduce(let production):
+                            if production != item.production {
+                                print("action conflict(reduce \(item.production.order)): <\(cc.order), \(item.predictNode)>")
+                            }
+                        default:
+                            break
+                        }
+                    }
                     analyticTable.actionCollection[cc.order, item.predictNode] = .reduce(production: item.production)
                 } else if item.production.order == 0,
                     item.stackNode == nil,

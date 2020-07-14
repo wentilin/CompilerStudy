@@ -15,7 +15,7 @@ class ParserBuilder {
     }
     
     static func buildLRParser(lexer: Lexer) -> LRParser {
-        let (terminals, nonterminals, productions) = ParserBuilder.buildBracketGrammer()
+        let (terminals, nonterminals, productions) = ParserBuilder.buildArithmeticGrammerWithoutEpsilon()
         return .init(lexer: lexer, terminals: terminals, nonterminals: nonterminals, productions: productions)
     }
     
@@ -42,6 +42,27 @@ class ParserBuilder {
         return (terminals, nonterminals, productions)
     }
     
+    private static func buildArithmeticGrammerWithoutEpsilon() -> ([TerminalNode], [NonterminalNode], [Production]) {
+        let terminals: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
+        
+        let nonterminals: [NonterminalNode] = [.goal, .expr, .term, .factor]
+        
+        let productions: [Production] = [
+            Production(left: .goal, right: [NonterminalNode.expr], order: 0),
+            Production(left: .expr, right: [NonterminalNode.expr, TerminalNode.plus, NonterminalNode.term], order: 1),
+            Production(left: .expr, right: [NonterminalNode.expr, TerminalNode.minus, NonterminalNode.term], order: 2),
+            Production(left: .expr, right: [NonterminalNode.term], order: 3),
+            Production(left: .term, right: [NonterminalNode.term, TerminalNode.multiply, NonterminalNode.factor], order: 4),
+            Production(left: .term, right: [NonterminalNode.term, TerminalNode.divide, NonterminalNode.factor], order: 5),
+            Production(left: .term, right: [NonterminalNode.factor], order: 6),
+            Production(left: .factor, right: [TerminalNode.leftParenthesis, NonterminalNode.expr, TerminalNode.rightParenthesis], order: 7),
+            Production(left: .factor, right: [TerminalNode.num], order: 8),
+            Production(left: .factor, right: [TerminalNode.name], order: 9),
+        ]
+        
+        return (terminals, nonterminals, productions)
+    }
+    
     private static func buildBracketGrammer() -> ([TerminalNode], [NonterminalNode], [Production]) {
         let terminals: [TerminalNode] = [.leftParenthesis, .rightParenthesis]
         
@@ -53,6 +74,21 @@ class ParserBuilder {
             Production(left: .list, right: [NonterminalNode.pair], order: 2),
             Production(left: .pair, right: [TerminalNode.leftParenthesis, NonterminalNode.pair, TerminalNode.rightParenthesis], order: 3),
             Production(left: .pair, right: [TerminalNode.leftParenthesis, TerminalNode.rightParenthesis], order: 4),
+        ]
+        
+        return (terminals, nonterminals, productions)
+    }
+    
+    private static func buildTestGrammer() -> ([TerminalNode], [NonterminalNode], [Production]) {
+        let terminals: [TerminalNode] = [.a, .b]
+        
+        let nonterminals: [NonterminalNode] = [.goal, .S, .B]
+        
+        let productions: [Production] = [
+            Production(left: .goal, right: [NonterminalNode.S], order: 0),
+            Production(left: .S, right: [NonterminalNode.B, NonterminalNode.B], order: 1),
+            Production(left: .B, right: [TerminalNode.a, NonterminalNode.B], order: 2),
+            Production(left: .B, right: [TerminalNode.b], order: 3),
         ]
         
         return (terminals, nonterminals, productions)

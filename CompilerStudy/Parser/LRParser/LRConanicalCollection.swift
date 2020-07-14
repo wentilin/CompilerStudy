@@ -67,7 +67,7 @@ struct LRConanicalCollection: Sequence, Equatable, Hashable {
     typealias Iterator  = AnyIterator<LRConanicalItem>
     
     func makeIterator() -> AnyIterator<LRConanicalItem> {
-        var innerIterator = items.makeIterator()
+        var innerIterator = Array(items).sorted(by: { $0.production.order < $1.production.order }).makeIterator()
 
         return AnyIterator { () -> LRConanicalItem? in
             return innerIterator.next()
@@ -130,7 +130,7 @@ struct LRConanicalGotoKey: Hashable, CustomStringConvertible {
     let node: Node
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(collection)
+        hasher.combine(collection.order)
         hasher.combine(node.value)
     }
     

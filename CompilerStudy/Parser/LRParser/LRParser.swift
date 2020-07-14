@@ -56,7 +56,7 @@ class LRParser: Parser {
         stack.append(collectionSet[0].order)
         currentToken = try lexer.nextToken()
         
-        print(stack)
+        print("\(stack) : \(currentToken.value) \(lexer)")
         
         while true {
             var state = stack.last as! Int
@@ -85,7 +85,7 @@ class LRParser: Parser {
                 throw NSError(domain: "LR(1) parse fail.", code: -1, userInfo: nil)
             }
             
-            print(stack)
+            print("\(stack) : \(currentToken.value) \(lexer)")
         }
     }
     

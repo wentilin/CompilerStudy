@@ -44,6 +44,10 @@ enum NonterminalNode: String, Node {
     case list = "list"
     case pair = "pair"
     
+    // test
+    case S
+    case B
+    
     var value: String { rawValue }
     var type: NodeType { .nonterminal }
 }
@@ -58,6 +62,10 @@ enum TerminalNode: String, Node {
     case name = "name"
     case leftParenthesis = "("
     case rightParenthesis = ")"
+    
+    // test
+    case a
+    case b
     
     var value: String { rawValue }
     var type: NodeType { .terminal }
