@@ -43,21 +43,24 @@ class ParserBuilder {
     }
     
     private static func buildArithmeticGrammerWithoutEpsilon() -> ([TerminalNode], [NonterminalNode], [Production]) {
-        let terminals: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis]
+        let terminals: [TerminalNode] = [.plus, .minus, .divide, .multiply, .num, .name, .leftParenthesis, .rightParenthesis, .equal]
         
-        let nonterminals: [NonterminalNode] = [.goal, .expr, .term, .factor]
+        let nonterminals: [NonterminalNode] = [.goal, .block, .assign, .expr, .term, .factor]
         
         let productions: [Production] = [
-            Production(left: .goal, right: [NonterminalNode.expr], order: 0),
-            Production(left: .expr, right: [NonterminalNode.expr, TerminalNode.plus, NonterminalNode.term], order: 1),
-            Production(left: .expr, right: [NonterminalNode.expr, TerminalNode.minus, NonterminalNode.term], order: 2),
-            Production(left: .expr, right: [NonterminalNode.term], order: 3),
-            Production(left: .term, right: [NonterminalNode.term, TerminalNode.multiply, NonterminalNode.factor], order: 4),
-            Production(left: .term, right: [NonterminalNode.term, TerminalNode.divide, NonterminalNode.factor], order: 5),
-            Production(left: .term, right: [NonterminalNode.factor], order: 6),
-            Production(left: .factor, right: [TerminalNode.leftParenthesis, NonterminalNode.expr, TerminalNode.rightParenthesis], order: 7),
-            Production(left: .factor, right: [TerminalNode.num], order: 8),
-            Production(left: .factor, right: [TerminalNode.name], order: 9),
+            Production(left: .goal, right: [NonterminalNode.block], order: 0),
+            Production(left: .block, right: [NonterminalNode.block, NonterminalNode.assign], order: 1),
+            Production(left: .block, right: [NonterminalNode.assign], order: 2),
+            Production(left: .assign, right: [TerminalNode.name, TerminalNode.equal, NonterminalNode.expr], order: 3),
+            Production(left: .expr, right: [NonterminalNode.expr, TerminalNode.plus, NonterminalNode.term], order: 4),
+            Production(left: .expr, right: [NonterminalNode.expr, TerminalNode.minus, NonterminalNode.term], order: 5),
+            Production(left: .expr, right: [NonterminalNode.term], order: 6),
+            Production(left: .term, right: [NonterminalNode.term, TerminalNode.multiply, NonterminalNode.factor], order: 7),
+            Production(left: .term, right: [NonterminalNode.term, TerminalNode.divide, NonterminalNode.factor], order: 8),
+            Production(left: .term, right: [NonterminalNode.factor], order: 9),
+            Production(left: .factor, right: [TerminalNode.leftParenthesis, NonterminalNode.expr, TerminalNode.rightParenthesis], order: 10),
+            Production(left: .factor, right: [TerminalNode.num], order: 11),
+            Production(left: .factor, right: [TerminalNode.name], order: 12),
         ]
         
         return (terminals, nonterminals, productions)
@@ -74,21 +77,6 @@ class ParserBuilder {
             Production(left: .list, right: [NonterminalNode.pair], order: 2),
             Production(left: .pair, right: [TerminalNode.leftParenthesis, NonterminalNode.pair, TerminalNode.rightParenthesis], order: 3),
             Production(left: .pair, right: [TerminalNode.leftParenthesis, TerminalNode.rightParenthesis], order: 4),
-        ]
-        
-        return (terminals, nonterminals, productions)
-    }
-    
-    private static func buildTestGrammer() -> ([TerminalNode], [NonterminalNode], [Production]) {
-        let terminals: [TerminalNode] = [.a, .b]
-        
-        let nonterminals: [NonterminalNode] = [.goal, .S, .B]
-        
-        let productions: [Production] = [
-            Production(left: .goal, right: [NonterminalNode.S], order: 0),
-            Production(left: .S, right: [NonterminalNode.B, NonterminalNode.B], order: 1),
-            Production(left: .B, right: [TerminalNode.a, NonterminalNode.B], order: 2),
-            Production(left: .B, right: [TerminalNode.b], order: 3),
         ]
         
         return (terminals, nonterminals, productions)

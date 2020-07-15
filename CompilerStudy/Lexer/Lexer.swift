@@ -18,6 +18,7 @@ struct LexerToken {
         case name = "name"
         case leftParenthesis = "("
         case rightParenthesis = ")"
+        case assign = "="
         case eof = "eof"
     }
     
@@ -42,6 +43,15 @@ class Lexer {
             if char == " " {
                 skpWhitespace()
                 continue
+            }
+            
+            if char.isAlpha {
+                return .init(value: identifier(), type: .name)
+            }
+            
+            if char == "=" {
+                advance()
+                return .init(value: "=", type: .assign)
             }
         
             if Int(char) != nil {
@@ -108,10 +118,30 @@ class Lexer {
         
         return Int(res)!
     }
+    
+    private func identifier() -> String {
+        var res = ""
+        if let char = currentChar, char.isAlphanumeric {
+            res += char
+            advance()
+        }
+        
+        return res
+    }
 }
 
 extension Lexer: CustomStringConvertible {
     var description: String {
         return stack.reversed().joined()
+    }
+}
+
+extension String {
+    var isAlphanumeric: Bool {
+        return !isEmpty && range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil
+    }
+    
+    var isAlpha: Bool {
+        return !isEmpty && range(of: "[^a-zA-Z]", options: .regularExpression) == nil
     }
 }

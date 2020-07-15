@@ -29,7 +29,7 @@ do {
 
 print("-----------------LR(1)-----------------")
 
-let _text = "1+(1+2)*2-4-(2/2)"
+let _text = "a=1+(1+2)*2-4-(2/2)"
 let _lexer = Lexer(_text)
 let lrParser = ParserBuilder.buildLRParser(lexer: _lexer)
 print("GOTOs\n:\(lrParser.gotoCollection)")

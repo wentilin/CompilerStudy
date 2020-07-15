@@ -34,19 +34,16 @@ extension Node {
 /// Nonterminal node
 enum NonterminalNode: String, Node {
     case goal = "goal"
+    case block = "block"
+    case assign = "assign"
     case expr = "expr"
     case expr_ = "expr_"
     case term = "term"
     case term_ = "term_"
     case factor = "factor"
-    
     // Bracket grammer node
     case list = "list"
     case pair = "pair"
-    
-    // test
-    case S
-    case B
     
     var value: String { rawValue }
     var type: NodeType { .nonterminal }
@@ -62,10 +59,7 @@ enum TerminalNode: String, Node {
     case name = "name"
     case leftParenthesis = "("
     case rightParenthesis = ")"
-    
-    // test
-    case a
-    case b
+    case equal = "="
     
     var value: String { rawValue }
     var type: NodeType { .terminal }
